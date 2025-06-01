@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+option csharp_namespace = "NetListOpsDemo.grpc";
+
+import "google/protobuf/timestamp.proto";
+
+// Pessoa
+message Pessoa {
+  int32 id = 1;
+  string nome = 2;
+  int32 idade = 3;
+}
+
+// Fiscalizacao
+message Fiscalizacao {
+  int32 id = 1;
+  int32 pessoaId = 2;
+  string area = 3;
+  google.protobuf.Timestamp data = 4;
+  repeated Pessoa pessoas = 5;
+}
+
+// Governo
+message Governo {
+  int32 id = 1;
+  string nome = 2;
+  string estado = 3;
+  repeated Fiscalizacao fiscalizacoes = 4;
+}
+
+// Requests e Responses para Pessoa
+message PessoaIdRequest {
+  int32 id = 1;
+}
+message PessoaList {
+  repeated Pessoa pessoas = 1;
+}
+message Empty {}
+
+service PessoaService {
+  rpc GetPessoa (PessoaIdRequest) returns (Pessoa);
+  rpc ListPessoas (Empty) returns (PessoaList);
+  rpc CreatePessoa (Pessoa) returns (Pessoa);
+  rpc DeletePessoa (PessoaIdRequest) returns (Empty);
+}
+
+// Requests e Responses para Fiscalizacao
+message FiscalizacaoIdRequest {
+  int32 id = 1;
+}
+message FiscalizacaoList {
+  repeated Fiscalizacao fiscalizacoes = 1;
+}
+
+service FiscalizacaoService {
+  rpc GetFiscalizacao (FiscalizacaoIdRequest) returns (Fiscalizacao);
+  rpc ListFiscalizacoes (Empty) returns (FiscalizacaoList);
+  rpc CreateFiscalizacao (Fiscalizacao) returns (Fiscalizacao);
+  rpc DeleteFiscalizacao (FiscalizacaoIdRequest) returns (Empty);
+}
+
+// Requests e Responses para Governo
+message GovernoIdRequest {
+  int32 id = 1;
+}
+message GovernoList {
+  repeated Governo governos = 1;
+}
+
+service GovernoService {
+  rpc GetGoverno (GovernoIdRequest) returns (Governo);
+  rpc ListGovernos (Empty) returns (GovernoList);
+  rpc CreateGoverno (Governo) returns (Governo);
+  rpc DeleteGoverno (GovernoIdRequest) returns (Empty);
+}

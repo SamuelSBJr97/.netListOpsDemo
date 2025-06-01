@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetListOpsDemo.Tests", "..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetListOpsDemo.Visual", "..\NetListOpsDemo.Visual\NetListOpsDemo.Visual.csproj", "{1340B190-0DF3-AEFF-5717-CC5812528C8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetListOpsDemo.grpc", "..\NetListOpsDemo.grpc\NetListOpsDemo.grpc.csproj", "{1F32E35B-2830-4DD5-B22A-ECCEB381BF7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{1340B190-0DF3-AEFF-5717-CC5812528C8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1340B190-0DF3-AEFF-5717-CC5812528C8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1340B190-0DF3-AEFF-5717-CC5812528C8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F32E35B-2830-4DD5-B22A-ECCEB381BF7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F32E35B-2830-4DD5-B22A-ECCEB381BF7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F32E35B-2830-4DD5-B22A-ECCEB381BF7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F32E35B-2830-4DD5-B22A-ECCEB381BF7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
