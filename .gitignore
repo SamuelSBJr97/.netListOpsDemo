@@ -1,0 +1,50 @@
+﻿# .gitignore
+
+## Compilação do Visual Studio
+bin/
+obj/
+[Bb]uild/
+[Bb]uild[Ll]og.*
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Diretórios do Visual Studio
+.vs/
+.vscode/
+
+## Arquivos de log e temporários
+*.log
+*.tlog
+*.tmp
+
+## Pacotes NuGet
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+
+## Configurações locais
+*.local.json
+*.userprefs
+
+## Arquivos de publicação
+publish/
+out/
+
+## Testes e cobertura
+TestResults/
+*.coverage
+*.coveragexml
+
+## Outros
+_ReSharper*/
+*.DotSettings.user
+.idea/
+*.dbmdl
+*.bak
+*.swp
+*.orig
+
+# Fim do .gitignore
