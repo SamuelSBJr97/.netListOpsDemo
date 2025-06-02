@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36127.28 d17.14
+VisualStudioVersion = 17.14.36127.28
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetListOpsDemo", "NetListOpsDemo.csproj", "{BFA092F9-98B6-E000-0683-C7E5CBC20154}"
 EndProject
@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetListOpsDemo.Visual", "..\NetListOpsDemo.Visual\NetListOpsDemo.Visual.csproj", "{1340B190-0DF3-AEFF-5717-CC5812528C8A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetListOpsDemo.grpc", "..\NetListOpsDemo.grpc\NetListOpsDemo.grpc.csproj", "{1F32E35B-2830-4DD5-B22A-ECCEB381BF7E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BFA092F9-98B6-E000-0683-C7E5CBC20154} = {BFA092F9-98B6-E000-0683-C7E5CBC20154}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

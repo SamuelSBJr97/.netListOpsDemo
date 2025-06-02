@@ -13,6 +13,8 @@ using LiveChartsCore.SkiaSharpView;
 using NetListOpsDemo;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading.Channels;
 
 namespace NetListOpsDemo.Visual;
 
@@ -21,16 +23,21 @@ namespace NetListOpsDemo.Visual;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private List<Pessoa> pessoasA;
-    private List<Pessoa> pessoasB;
+    private List<Pessoa> pessoasA = new();
+    private List<Pessoa> pessoasB = new();
     private List<Pessoa> lastResult = new();
+    private Channel<List<Governo>> _mensageriaChannel = Channel.CreateUnbounded<List<Governo>>();
+    private List<Governo> _governosGrpc = new();
 
     public MainWindow()
     {
         InitializeComponent();
+        Loaded += Window_Loaded;
+        TreeGov.SelectedItemChanged += TreeGov_SelectedItemChanged;
         InitLists();
         ShowLists();
         ShowVennDiagram();
+        StartMensageriaListener();
     }
 
     private void InitLists()
@@ -82,32 +89,30 @@ public partial class MainWindow : Window
 
     private void ShowLists()
     {
+        if (ListA == null || ListB == null || ListResult == null) return;
         ListA.ItemsSource = null;
         ListB.ItemsSource = null;
-        ListA.ItemsSource = pessoasA.ConvertAll(p => $"Id: {p.Id}, Nome: {p.Nome}, Idade: {p.Idade}");
-        ListB.ItemsSource = pessoasB.ConvertAll(p => $"Id: {p.Id}, Nome: {p.Nome}, Idade: {p.Idade}");
+        ListA.ItemsSource = pessoasA?.ConvertAll(p => $"Id: {p.Id}, Nome: {p.Nome}, Idade: {p.Idade}") ?? new List<string>();
+        ListB.ItemsSource = pessoasB?.ConvertAll(p => $"Id: {p.Id}, Nome: {p.Nome}, Idade: {p.Idade}") ?? new List<string>();
         ListResult.ItemsSource = null;
     }
 
     private void ShowResult(IEnumerable<Pessoa> pessoas)
     {
-        lastResult = pessoas.ToList();
+        lastResult = pessoas?.ToList() ?? new List<Pessoa>();
         ListResult.ItemsSource = lastResult.Select(p => $"Id: {p.Id}, Nome: {p.Nome}, Idade: {p.Idade}").ToList();
         UpdateVennDiagramFromResult();
     }
 
     private void UpdateVennDiagramFromResult()
     {
-        // Atualiza o diagrama para mostrar a relação entre o resultado e as listas A e B
+        if (TxtGovernoCount == null || TxtFiscalizacaoCount == null || TxtIntersecaoCount == null) return;
         var pessoasFiscalizacao = pessoasA?.Select(p => p.Id).ToHashSet() ?? new HashSet<int>();
         var pessoasGoverno = pessoasB?.Select(p => p.Id).ToHashSet() ?? new HashSet<int>();
         var pessoasResultado = lastResult?.Select(p => p.Id).ToHashSet() ?? new HashSet<int>();
-
-        // Interseção entre resultado e cada conjunto
         var intersecFiscalizacao = pessoasResultado.Intersect(pessoasFiscalizacao).Count();
         var intersecGoverno = pessoasResultado.Intersect(pessoasGoverno).Count();
         var intersecAmbos = pessoasResultado.Intersect(pessoasFiscalizacao.Intersect(pessoasGoverno)).Count();
-
         TxtGovernoCount.Text = intersecGoverno.ToString();
         TxtFiscalizacaoCount.Text = intersecFiscalizacao.ToString();
         TxtIntersecaoCount.Text = intersecAmbos.ToString();
@@ -147,13 +152,120 @@ public partial class MainWindow : Window
 
     private void ShowVennDiagram()
     {
-        // pessoasA = pessoas da fiscalização
-        // pessoasB = pessoas do governo
+        if (TxtGovernoCount == null || TxtFiscalizacaoCount == null || TxtIntersecaoCount == null) return;
         var pessoasFiscalizacao = pessoasA?.Select(p => p.Id).ToHashSet() ?? new HashSet<int>();
         var pessoasGoverno = pessoasB?.Select(p => p.Id).ToHashSet() ?? new HashSet<int>();
         var pessoasAmbos = pessoasGoverno.Intersect(pessoasFiscalizacao).Count();
         TxtGovernoCount.Text = pessoasGoverno.Count.ToString();
         TxtFiscalizacaoCount.Text = pessoasFiscalizacao.Count.ToString();
         TxtIntersecaoCount.Text = pessoasAmbos.ToString();
+    }
+
+    // Simulação de obtenção de dados via gRPC
+    private async Task<List<Governo>> ObterGovernosViaGrpcAsync()
+    {
+        // Aqui você substituiria pelo seu client gRPC real
+        var random = new Random();
+        var lista = new List<Governo>();
+        int pessoaId = 1;
+        for (int g = 1; g <= 3; g++)
+        {
+            var fiscalizacoes = new List<Fiscalizacao>();
+            for (int f = 1; f <= 2; f++)
+            {
+                var pessoas = new List<Pessoa>();
+                for (int p = 1; p <= 5; p++)
+                {
+                    pessoas.Add(new Pessoa { Id = pessoaId++, Nome = $"Pessoa_{g}_{f}_{p}", Idade = random.Next(18, 70) });
+                }
+                fiscalizacoes.Add(new Fiscalizacao
+                {
+                    Id = (g - 1) * 2 + f,
+                    PessoaId = 0,
+                    Area = $"Area_{f}",
+                    Data = DateTime.Now.AddDays(-f),
+                    Pessoas = pessoas
+                });
+            }
+            lista.Add(new Governo
+            {
+                Id = g,
+                Nome = $"Governo_{g}",
+                Estado = $"Estado_{g}",
+                Fiscalizacoes = fiscalizacoes
+            });
+        }
+        return lista;
+    }
+
+    private async void BtnAtualizarGrpc_Click(object sender, RoutedEventArgs e)
+    {
+        var governos = await ObterGovernosViaGrpcAsync();
+        await _mensageriaChannel.Writer.WriteAsync(governos);
+    }
+
+    private async void StartMensageriaListener()
+    {
+        _ = Task.Run(async () =>
+        {
+            await foreach (var governos in _mensageriaChannel.Reader.ReadAllAsync())
+            {
+                Dispatcher.Invoke(() => PopularTreeView(governos));
+            }
+        });
+    }
+
+    private async void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        var governos = await ObterGovernosViaGrpcAsync();
+        await _mensageriaChannel.Writer.WriteAsync(governos);
+    }
+
+    private void PopularTreeView(List<Governo> governos)
+    {
+        _governosGrpc = governos;
+        TreeGov.Items.Clear();
+        foreach (var gov in governos)
+        {
+            var govNode = new TreeViewItem { Header = $"Governo: {gov.Nome} ({gov.Estado})", Tag = gov };
+            foreach (var fisc in gov.Fiscalizacoes)
+            {
+                var fiscNode = new TreeViewItem { Header = $"Fiscalização: {fisc.Area} ({fisc.Data:dd/MM/yyyy})", Tag = fisc };
+                foreach (var pessoa in fisc.Pessoas)
+                {
+                    fiscNode.Items.Add(new TreeViewItem { Header = $"Pessoa: {pessoa.Nome} (Idade: {pessoa.Idade})", Tag = pessoa });
+                }
+                govNode.Items.Add(fiscNode);
+            }
+            TreeGov.Items.Add(govNode);
+        }
+    }
+
+    private void TreeGov_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    {
+        if (TreeGov.SelectedItem is TreeViewItem item)
+        {
+            if (item.Tag is Governo gov)
+            {
+                pessoasA = gov.Fiscalizacoes.SelectMany(f => f.Pessoas).ToList();
+                pessoasB = new List<Pessoa>();
+                ShowLists();
+                ShowVennDiagram();
+            }
+            else if (item.Tag is Fiscalizacao fisc)
+            {
+                pessoasA = fisc.Pessoas;
+                pessoasB = new List<Pessoa>();
+                ShowLists();
+                ShowVennDiagram();
+            }
+            else if (item.Tag is Pessoa pessoa)
+            {
+                pessoasA = new List<Pessoa> { pessoa };
+                pessoasB = new List<Pessoa>();
+                ShowLists();
+                ShowVennDiagram();
+            }
+        }
     }
 }

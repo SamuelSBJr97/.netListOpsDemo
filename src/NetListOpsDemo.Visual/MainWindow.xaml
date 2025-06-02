@@ -18,12 +18,14 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBlock Grid.ColumnSpan="3" Text="Visualização das Operações de Lista" FontWeight="Bold" FontSize="18" Margin="10" HorizontalAlignment="Center"/>
-        <ListBox x:Name="ListA" Grid.Column="0" Grid.Row="1" Margin="10"/>
+        <TreeView x:Name="TreeGov" Grid.Column="0" Grid.Row="1" Margin="10"/>
+        <ListBox x:Name="ListA" Grid.Column="0" Grid.Row="1" Margin="10" Visibility="Collapsed"/>
         <StackPanel Grid.Column="1" Grid.Row="1" Margin="10" VerticalAlignment="Center">
             <Button x:Name="BtnDistinct" Content="Distinct" Margin="0,5" Width="100" Click="BtnDistinct_Click"/>
             <Button x:Name="BtnIntersect" Content="Intersect" Margin="0,5" Width="100" Click="BtnIntersect_Click"/>
             <Button x:Name="BtnExcept" Content="Except" Margin="0,5" Width="100" Click="BtnExcept_Click"/>
             <Button x:Name="BtnUnion" Content="Union" Margin="0,5" Width="100" Click="BtnUnion_Click"/>
+            <Button x:Name="BtnAtualizarGrpc" Content="Atualizar (gRPC)" Margin="0,5" Width="150" Click="BtnAtualizarGrpc_Click"/>
             <Separator Height="10"/>
             <TextBlock Text="Venn: Governo, Fiscalização" Margin="0,10,0,0" FontWeight="Bold"/>
             <Grid Height="220" Width="220" Margin="0,10,0,0">

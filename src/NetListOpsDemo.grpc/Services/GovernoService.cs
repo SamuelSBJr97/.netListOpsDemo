@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace NetListOpsDemo.grpc.Services
 {
-    public class GovernoService : NetListOpsDemo.grpc.GovernoService.GovernoServiceBase
+    public class GovernoServiceImpl : NetListOpsDemo.grpc.GovernoService.GovernoServiceBase
     {
         private static readonly ConcurrentDictionary<int, Governo> Governos = new();
 
